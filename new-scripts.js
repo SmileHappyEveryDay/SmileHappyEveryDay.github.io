@@ -15,6 +15,26 @@ function hideLoading() {
     console.log('close spin.')
 }
 
+function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    const results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
+
+function searchFromURL() {
+    const tutorName = getUrlParameter('tutor');
+    if (tutorName) {
+        document.getElementById('professor-input').value = tutorName;
+        const matchedTutor = datas.find(item => item.professor === tutorName);
+        if (matchedTutor) {
+            search();  // Perform the search and display results
+        } else {
+            alert('Tutor ' + tutorName + ' not found');
+        }
+    }
+}
+
 async function loadExcel() {
     console.log('start loading.')
     showLoading();  // Show the loading screen
@@ -53,6 +73,7 @@ async function loadExcel() {
     });
 
     updateSchoolDatalist();
+    searchFromURL();  // <- Add this line to trigger the search based on URL parameter
     } catch (error) {
     console.error('Error loading the Excel file:', error);
     alert('Error loading the Excel file: ' + error.message);
