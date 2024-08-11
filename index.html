@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professor Search</title>
+    <link rel="stylesheet" href="styles.css">
+        <!--<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>-->
+    <script src="xlsx.full.min.js"></script>
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/4.0.0/spin.min.js"></script>-->
+<!--    <script src="spin.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/4.0.0/spin.min.js"></script>-->
+</head>
+<body>
+    <div id="loading-overlay">
+        <div id="loading-spinner"></div>
+        <p>Loading, please wait...</p>
+    </div>
+    <div class="container">
+        <h1>Professor Search</h1>
+        <div class="search-box">
+            <input type="text" id="school-input" placeholder="Enter School Name" list="schools" oninput="updateDepartments_new()"> <!--updateDepartments()-->
+            <input type="text" id="department-input" placeholder="Enter Department Name" list="departments" oninput="updateProfessors()">
+            <input type="text" id="professor-input" placeholder="Enter Professor Name" list="professors">
+            <button onclick="search()">Search</button>
+        </div>
+        <div id="results"></div>
+    </div>
+
+    <script src="data.js"></script>
+<!--    <script src="scripts.js"></script>-->
+    <script src="new-scripts.js"></script>
+</body>
+</html>
