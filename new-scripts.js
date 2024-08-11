@@ -24,6 +24,7 @@ function getUrlParameter(name) {
 
 function searchFromURL() {
     const tutorName = getUrlParameter('tutor');
+    console.log(tutorName)
     if (tutorName) {
         document.getElementById('professor-input').value = tutorName;
         const matchedTutor = datas.find(item => item.professor === tutorName);
@@ -32,6 +33,11 @@ function searchFromURL() {
         } else {
             alert('Tutor ' + tutorName + ' not found');
         }
+    }
+    else
+    {
+        document.getElementById('professor-input').value = '骆祥峰';
+        search();
     }
 }
 
@@ -52,7 +58,7 @@ async function loadExcel() {
         const department = item['专业'];
         const professor = item['姓名'];
         const review = item['评价'];
-        const score = item['SnowNLP的情感打分（0-1）仅供参考'];
+        const score = item['SnowNLP的情感打分(0-1)仅供参考'];
 
         // Add to sets for auto-complete
         schools.add(school);
@@ -64,10 +70,13 @@ async function loadExcel() {
         departmentsMap[school].add(department);
 
         // Map professors to departments
-        if (!professorsMap[department]) {
-            professorsMap[department] = new Set();
+        if (!professorsMap[school]) {
+            professorsMap[school] = {};
         }
-        professorsMap[department].add(professor);
+        if (!professorsMap[school][department]) {
+                professorsMap[school][department] = new Set();
+            }
+            professorsMap[school][department].add(professor);
 
         return { school, department, professor, review, score };
     });
@@ -96,26 +105,26 @@ function updateSchoolDatalist() {
     document.body.appendChild(schoolDatalist);
 }
 
-function updateDepartments() {
-    const schoolInput = document.getElementById('school-input').value;
-    const departmentInput = document.getElementById('department-input');
-    departmentInput.value = '';
-    departmentInput.placeholder = 'Enter Department Name';
-    const departmentDatalist = document.getElementById('departments') || document.createElement('datalist');
-    departmentDatalist.id = 'departments';
-    departmentDatalist.innerHTML = '';
-
-    if (departmentsMap[schoolInput]) {
-        departmentsMap[schoolInput].forEach(department => {
-            const option = document.createElement('option');
-            option.value = department;
-            departmentDatalist.appendChild(option);
-        });
-    }
-
-    document.body.appendChild(departmentDatalist);
-    updateProfessors(); // Clear the professors when changing school or department
-}
+// function updateDepartments() {
+//     const schoolInput = document.getElementById('school-input').value;
+//     const departmentInput = document.getElementById('department-input');
+//     departmentInput.value = '';
+//     departmentInput.placeholder = 'Enter Department Name';
+//     const departmentDatalist = document.getElementById('departments') || document.createElement('datalist');
+//     departmentDatalist.id = 'departments';
+//     departmentDatalist.innerHTML = '';
+//
+//     if (departmentsMap[schoolInput]) {
+//         departmentsMap[schoolInput].forEach(department => {
+//             const option = document.createElement('option');
+//             option.value = department;
+//             departmentDatalist.appendChild(option);
+//         });
+//     }
+//
+//     document.body.appendChild(departmentDatalist);
+//     updateProfessors(); // Clear the professors when changing school or department
+// }
 
 function updateDepartments_new() {
     const schoolInput = document.getElementById('school-input').value;
@@ -140,11 +149,21 @@ function updateDepartments_new() {
             departmentDatalist.appendChild(option);
         });
 
-        // Also update professors based on the selected school
+        // // Also update professors based on the selected school
+        // const professors = new Set();
+        // departmentsMap[schoolInput].forEach(department => {
+        //     if (professorsMap[department]) {
+        //         professorsMap[department].forEach(professor => {
+        //             professors.add(professor);
+        //         });
+        //     }
+        // });
+
+        // Also update professors based on the selected school and department
         const professors = new Set();
         departmentsMap[schoolInput].forEach(department => {
-            if (professorsMap[department]) {
-                professorsMap[department].forEach(professor => {
+            if (professorsMap[schoolInput][department]) {
+                professorsMap[schoolInput][department].forEach(professor => {
                     professors.add(professor);
                 });
             }
@@ -162,6 +181,7 @@ function updateDepartments_new() {
 }
 
 function updateProfessors() {
+    const schoolInput = document.getElementById('school-input').value;
     const departmentInput = document.getElementById('department-input').value;
     const professorInput = document.getElementById('professor-input');
     professorInput.value = '';
@@ -170,8 +190,16 @@ function updateProfessors() {
     professorDatalist.id = 'professors';
     professorDatalist.innerHTML = '';
 
-    if (professorsMap[departmentInput]) {
-        professorsMap[departmentInput].forEach(professor => {
+    // if (professorsMap[departmentInput]) {
+    //     professorsMap[departmentInput].forEach(professor => {
+    //         const option = document.createElement('option');
+    //         option.value = professor;
+    //         professorDatalist.appendChild(option);
+    //     });
+    // }
+
+    if (professorsMap[schoolInput] && professorsMap[schoolInput][departmentInput]) {
+        professorsMap[schoolInput][departmentInput].forEach(professor => {
             const option = document.createElement('option');
             option.value = professor;
             professorDatalist.appendChild(option);
@@ -181,10 +209,35 @@ function updateProfessors() {
     document.body.appendChild(professorDatalist);
 }
 
+function convertScoreToStars(score) {
+    const maxStars = 5;
+    const scaledScore = Math.round(score * maxStars);
+    let starsHTML = '';
+
+    for (let i = 0; i < maxStars; i++) {
+        if (i < scaledScore) {
+            starsHTML += '<span class="star full"></span>';
+        } else {
+            starsHTML += '<span class="star empty"></span>';
+        }
+    }
+
+    // return `<div class="star-rating">${starsHTML}</div>`;
+
+    return `<span class="star-rating">
+                ${starsHTML}
+            </span>`;
+}
+
 function search() {
-    const schoolInput = document.getElementById('school-input').value;
-    const departmentInput = document.getElementById('department-input').value;
-    const professorInput = document.getElementById('professor-input').value;
+    const schoolInput = document.getElementById('school-input').value.trim();
+    const departmentInput = document.getElementById('department-input').value.trim();
+    const professorInput = document.getElementById('professor-input').value.trim();
+    // 检查是否至少输入了一项
+    if (!schoolInput && !departmentInput && !professorInput) {
+        alert('请至少输入一项');
+        return;
+    }
     const results = datas.filter(item =>
         item.school.includes(schoolInput) &&
         item.department.includes(departmentInput) &&
@@ -193,18 +246,23 @@ function search() {
 
     const resultsDiv = document.getElementById('results');
     resultsDiv.innerHTML = '';
-
+    const tooltip = 'AI文本情感评测模型预测值，存在一定误差（满分：五星）';
     if (results.length === 0) {
         resultsDiv.innerHTML = '<p>No results found.</p>';
     } else {
         results.forEach(result => {
+            const starsHTML = convertScoreToStars(result.score);
             const resultItem = document.createElement('div');
             resultItem.className = 'result-item';
             resultItem.innerHTML = `
                 <h3>${result.professor} - ${result.school}</h3>
                 <p>${result.department}</p>
                 <p>${result.review}</p>
-                <p><strong>Sentiment Score:</strong> ${result.score}</p>
+                <!-- <span>${tooltip}</span> -->
+                <p style="font-size: 14px; font-weight: bold; color: #5DADE2;">${tooltip}</p>
+                <p><strong>Sentiment Score:</strong> ${result.score} ${starsHTML}
+                </p>
+                
             `;
             resultsDiv.appendChild(resultItem);
         });

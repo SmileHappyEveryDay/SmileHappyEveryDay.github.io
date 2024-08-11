@@ -85,3 +85,81 @@ h1 {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+.star-rating {
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  color: red; /* Gold color for the stars */
+}
+.star-rating .star {
+  cursor: pointer;
+}
+.star-rating .star.full::before {
+  content: '★';
+}
+.star-rating .star.empty::before {
+  content: '☆';
+}
+
+/* Triangle warning icon */
+.warning-icon {
+    display: inline-block;
+    margin-left: 10px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid orange; /* Triangle color */
+    position: relative;
+    cursor: pointer;
+}
+
+/* Tooltip */
+.tooltip {
+    display: none;
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10;
+    top: 25px;
+    left: -10px;
+}
+
+/* Show tooltip on hover */
+.warning-icon:hover .tooltip,
+.warning-icon:focus .tooltip {
+    display: block;
+}
+
+ /* 使用 flexbox 布局 */
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    flex: 1; /* 使内容区域自适应填充剩余空间 */
+}
+
+footer {
+    /*background-color: #FF5733;*/
+    width: 100%;
+}
+
+.footer-content {
+    text-align: center;
+    padding: 10px;
+}
+
+.footer-content div {
+    color: green;
+    padding: 10px;
+    font-style: italic;
+    font-weight: bolder;
+}
